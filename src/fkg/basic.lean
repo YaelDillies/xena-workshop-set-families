@@ -21,12 +21,13 @@ protected lemma linear_order.log_super_modular [linear_order α] [comm_semigroup
   log_super_modular f :=
 λ a b, by cases le_total a b; simp [h, mul_comm]
 
-variables [distrib_lattice α] [decidable_eq α] [fintype α] [ordered_semiring β]
+variables [distrib_lattice α] [decidable_eq α] [ordered_semiring β]
   {f f₁ f₂ f₃ f₄ g μ : α → β}
 
 /-- The **four functions theorem** -/
-lemma four_functions_theorem (h₁ : 0 ≤ f₁) (h₂ : 0 ≤ f₂) (h₃ : 0 ≤ f₃) (h₄ : 0 ≤ f₄)
-  (h : ∀ a b, f₁ a * f₂ b ≤ f₃ (a ⊔ b) * f₄ (a ⊓ b)) (s t : finset α) :
+lemma four_functions_theorem (h₁ : ∀ a ∈ u, 0 ≤ f₁ a) (h₂ : ∀ a ∈ u,  0 ≤ f₂)
+  (h₃ : ∀ a ∈ u,  0 ≤ f₃) (h₄ : ∀ a ∈ u,  0 ≤ f₄)
+  (h : ∀ a b, f₁ a * f₂ b ≤ f₃ (a ⊔ b) * f₄ (a ⊓ b)) {s t u : finset α} (hs : s ⊆ u) (ht : t ⊆ u) :
   (∑ a in s, f₁ a) * (∑ b in t, f₂ b) ≤ (∑ a in s ∪ t, f₃ a) * (∑ b in s ∩ t, f₄ b) :=
 begin
   sorry
