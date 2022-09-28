@@ -119,13 +119,18 @@ end order
 def strongly_shatter (𝒜 : finset (finset α)) (s : finset α) : Prop :=
 ∃ t, ∀ ⦃u⦄, u ⊆ s → ∃ v ∈ 𝒜, s ∩ v = u ∧ v \ s = t
 
+@[elab_as_eliminator]
+lemma family_induction (p : finset (finset α) → Prop) (hemp : p ∅)
+  (h : ∀ a s (𝒜 : finset (finset α)), (∀ t ∈ 𝒜, t ⊆ insert a s) →
+    p (𝒜.member_subfamily a) → p (𝒜.non_member_subfamily a) → p 𝒜) (𝒜 : finset (finset α)) : p 𝒜 :=
+sorry
+
 /-- Pajor's variant of the **Sauer-Shelah lemma**. -/
 lemma le_card_shatterer (𝒜 : finset (finset α)) : 𝒜.card ≤ 𝒜.shatterer.card :=
 begin
-  induction 𝒜 using finset.strong_induction with 𝒜 ih,
-  obtain rfl | h𝒜 := 𝒜.eq_empty_or_nonempty,
-  { exact bot_le },
-
+  refine finset.family_induction _ _ _ 𝒜,
+  { simp },
+  
   sorry
 end
 
