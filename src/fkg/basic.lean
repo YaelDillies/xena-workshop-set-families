@@ -30,77 +30,10 @@ lemma four_functions_theorem' {u : finset α}  (h₁ : ∀ s ⊆ u, 0 ≤ f₁ s
   (h : ∀ a b, f₁ a * f₂ b ≤ f₃ (a ⊔ b) * f₄ (a ⊓ b)) {s t : finset (finset α)} (hs : s ⊆ u.powerset) (ht : t ⊆ u.powerset) :
   (∑ a in s, f₁ a) * (∑ b in t, f₂ b) ≤ (∑ a in s ∪ t, f₃ a) * (∑ b in s ∩ t, f₄ b) :=
 begin
-  induction u using finset.induction generalizing f₁ f₂ f₃ f₄,
-  {
-    have h1: (∅:finset α).powerset = {∅},
-    exact finset.powerset_empty,
-    rw h1 at hs ht,
-    have h2: s = ∅ ∨ s = {∅},
-    exact finset.subset_singleton_iff.mp hs,
-    have h3: t = ∅ ∨ t = {∅},
-    exact finset.subset_singleton_iff.mp ht,
-    cases h2,
-    {
-    cases h3,
-      {
-      rw h2,
-      rw h3,
-      have h4: (∑ (a : finset α) in ∅, f₁ a) = 0,
-      refl,
-      have h5: ∑ (b : finset α) in ∅, f₂ b = 0,
-      refl,
-      have h6: (∑ (a : finset α) in ∅ ∪ ∅, f₃ a) = 0,
-      refl, 
-      have h7: ∑ (b : finset α) in ∅ ∩ ∅, f₄ b = 0,
-      refl,
-      rw h4,
-      rw h5,
-      rw h6,
-      rw h7,
-      },
-
-      { 
-        rw h2,
-        rw h3,
-        have h4: (∑ (a : finset α) in ∅, f₁ a) = 0,
-        refl,
-        have h5: ∑ (b : finset α) in {∅}, f₂ b = f₂ ∅,
-        simp,
-        have h6: (∑ (a : finset α) in ∅ ∪ {∅}, f₃ a) = f₃ ∅,
-        simp,
-        have h7: ∑ (b : finset α) in ∅ ∩ {∅}, f₄ b = 0,
-        simp,
-        rw h4,
-        rw h5,
-        rw h6,
-        rw h7,
-        simp,
-      },
-    },
-
-    {
-      cases h3,
-      {
-        simp,
-        rw h2,
-        rw h3,
-        simp,
-      },
-      {
-        simp,
-        rw h2,
-        rw h3,
-        simp,
-        specialize h ∅ ∅,
-        simp at h,
-        exact h,
-      }
-    },
-  },
-
-  {
+  induction u using finset.induction with a u h9 ih generalizing f₁ f₂ f₃ f₄,
+  { simp only [finset.powerset_empty, finset.subset_singleton_iff] at hs ht,
+    obtain rfl | rfl := hs; obtain rfl | rfl := ht; simpa using h ∅ ∅ <|> simp },
     
-  }
 end
 
 end finset
