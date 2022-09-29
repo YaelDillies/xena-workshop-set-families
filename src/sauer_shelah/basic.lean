@@ -109,7 +109,10 @@ def order_shatter : finset (finset α) → list α → Prop
     ∧ ∀ ⦃s : finset α⦄, s ∈ 𝒜.non_member_subfamily a → ∀ ⦃t⦄, t ∈ 𝒜.member_subfamily a →
       s.filter (λ b, a < b) = t.filter (λ b, a < b)
 
-instance : decidable_pred 𝒜.order_shatter := sorry
+instance : decidable_pred 𝒜.order_shatter := 
+  begin 
+    sorry,
+  end
 
 def order_shatterer (𝒜 : finset (finset α)) : finset (finset α) :=
 (𝒜.bUnion powerset).filter $ λ s, 𝒜.order_shatter $ s.sort (≤)
@@ -145,7 +148,10 @@ finset.le_sup $ mem_filter.2 ⟨mem_univ _, h⟩
 /-- Down-compressing decreases the VC-dimension. -/
 lemma vc_dimension_compress_le (a : α) (𝒜 : finset (finset α)) :
   (𝓓 a 𝒜).vc_dimension ≤ 𝒜.vc_dimension :=
-sorry
+begin
+  
+  
+end
 
 /-- The **Sauer-Shelah lemma**. -/
 lemma card_shatterer_le_sum_vc_dimension :
