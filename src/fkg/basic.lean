@@ -32,7 +32,10 @@ lemma four_functions_theorem' {u : finset α}  (h₁ : ∀ s ⊆ u, 0 ≤ f₁ s
 begin
   induction u using finset.induction with a u h9 ih generalizing f₁ f₂ f₃ f₄,
   { simp only [finset.powerset_empty, finset.subset_singleton_iff] at hs ht,
-    obtain rfl | rfl := hs; obtain rfl | rfl := ht; simpa using h ∅ ∅ <|> simp },
+    obtain rfl | rfl := hs; obtain rfl | rfl := ht; simpa using h ∅ ∅ <|> simp 
+  },
+  
+  
     
 end
 
