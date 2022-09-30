@@ -132,7 +132,7 @@ def strongly_shatter (𝒜 : finset (finset α)) (s : finset α) : Prop :=
 ∃ t, ∀ ⦃u⦄, u ⊆ s → ∃ v ∈ 𝒜, s ∩ v = u ∧ v \ s = t
 
 @[elab_as_eliminator]
-lemma family_induction (p : finset (finset α) → Prop) (hemp : p ∅)
+lemma family_induction (p : finset (finset α) → Prop) (hemp : p ∅)(hone: p {∅})
   (h : ∀ a s (𝒜 : finset (finset α)), (∀ t ∈ 𝒜, t ⊆ insert a s) →
     p (𝒜.member_subfamily a) → p (𝒜.non_member_subfamily a) → p 𝒜) (𝒜 : finset (finset α)) : p 𝒜 :=
 sorry
@@ -160,8 +160,10 @@ lemma insert_inj_non_mem (a : α) : {s : finset α | a ∉ s}.inj_on (λ s, inse
 /-- Pajor's variant of the **Sauer-Shelah lemma**. -/
 lemma le_card_shatterer (𝒜 : finset (finset α)) : 𝒜.card ≤ 𝒜.shatterer.card :=
 begin
-  refine finset.family_induction _ _ _ 𝒜,
+  refine finset.family_induction _ _ _ _ 𝒜,
   { simp },
+  {refl,},
+
   intros a s t h1 h2 h3,
 
   have h4:  (member_subfamily a t).card + (non_member_subfamily a t).card = t.card,
@@ -466,7 +468,7 @@ finset.le_sup $ mem_filter.2 ⟨mem_univ _, h⟩
 /-- Down-compressing decreases the VC-dimension. -/
 lemma vc_dimension_compress_le (a : α) (𝒜 : finset (finset α)) :
   (𝓓 a 𝒜).vc_dimension ≤ 𝒜.vc_dimension :=
-begin 
+begin
   sorry,
 end
 
