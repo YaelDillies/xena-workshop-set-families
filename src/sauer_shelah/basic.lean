@@ -460,16 +460,209 @@ end
 variables [fintype α]
 
 /-- The Vapnik-Chervonenkis dimension of a set family is the maximal size of a set it shatters. -/
-def vc_dimension (𝒜 : finset (finset α)) : ℕ := (univ.filter 𝒜.shatter).sup card
+def vc_dimension (𝒜 : finset (finset α)) : ℕ := 𝒜.shatterer.sup card
+
+lemma def_vc_dimension (𝒜 : finset (finset α)) : 
+  vc_dimension (𝒜 : finset (finset α)) = 𝒜.shatterer.sup card := 
+rfl
 
 lemma shatter.card_le_vc_dimension (h : 𝒜.shatter s) : s.card ≤ 𝒜.vc_dimension :=
-finset.le_sup $ mem_filter.2 ⟨mem_univ _, h⟩
+begin
+  rw def_vc_dimension,
+  have hs: s ∈ 𝒜.shatterer,
+  {simp,
+  apply h,
+  },
+  exact finset.le_sup hs,
+end
+
+lemma ss_of_shatter_compress (a : α) (𝒜 : finset (finset α)): 
+  (𝓓 a 𝒜).shatterer ⊆ 𝒜.shatterer :=
+begin 
+  intros F hF,
+  have hF0 := hF,
+  rw mem_shatterer,
+  rw mem_shatterer at hF hF0,
+  intros E hE,
+  specialize hF hE,
+  cases hF with S h,
+  cases h with hS h1,
+  by_cases hS2: S ∈ 𝒜 ,
+  {
+    use S,
+    split;
+    assumption,
+  },
+  {
+    by_cases ha: a ∈ F,
+    {
+      have h0 : {a} ⊆ F,
+      simp,
+      exact ha,
+      have h: E ∪ {a} ⊆ F,
+      {exact union_subset hE h0,},
+      specialize hF0 h,
+      cases hF0 with S2 h11,
+      cases h11 with hS2' h11,
+      have h2: a ∈ S2,
+      {
+        have h3: a ∈ E ∪ {a},
+        {simp,},
+        rw ← h11 at h3,
+        exact mem_of_mem_inter_right h3,
+      },
+      use erase S2 a,
+      rw down.mem_compression at hS2',
+      cases hS2' with hS2' hS2',
+      {
+        split,
+        exact hS2'.right,
+        have h3: a ∉ S,
+        {
+          rw down.mem_compression at hS,
+          cases hS with hS hS,
+          {
+            exfalso,
+            exact hS2 hS.1,
+          },
+          {
+            cases hS with hS0 hS,
+            by_contra hn,
+            have himp: insert a S = S,
+            {
+            simp,
+            exact hn,
+            },
+            rw himp at hS,
+            exact hS0 hS,
+          },
+        },
+        have h4: a ∉ E,
+        {
+          by_contra hn,
+          rw ← h1 at hn,
+          rw mem_inter at hn,
+          exact h3 hn.2,
+        },
+        have h5: (F ∩ S2)\{a} = (E ∪ {a})\{a},
+        {
+          rw h11,
+        },
+        have h6: (E ∪ {a})\{a} = (E\{a}) ∪ ({a}\{a}):= finset.union_sdiff_distrib E {a} {a},
+        simp at h6,
+        have h7: E\{a} = E,
+        {
+          have h70: disjoint E {a},
+          {
+            simp,
+            exact h4,
+          },
+          exact finset.sdiff_eq_self_of_disjoint h70,
+        },
+        rw h6 at h5,
+        rw h7 at h5,
+        rw ← h5,
+        ext x,
+        split,
+        {
+          intro hx,
+          rw mem_inter at hx,
+          rw mem_sdiff,
+          split,
+          {
+            rw mem_inter,
+            split,
+            exact hx.1,
+            have h8: S2.erase a ⊆ S2,
+            {
+              exact erase_subset a S2,
+            },
+            exact h8 hx.2,
+          },
+          {
+            cases hx with hx1 hx2,
+            rw mem_erase at hx2,
+            simp,
+            exact hx2.1,
+          },
+        },
+        {
+          intro hx,
+          rw mem_inter,
+          rw mem_sdiff at hx,
+          cases hx with hx1 hx2,
+          split,
+          {
+            rw mem_inter at hx1,
+            exact hx1.1,
+          },
+          {
+            rw mem_erase,
+            simp at hx2,
+            split,
+            exact hx2,
+            rw mem_inter at hx1,
+            exact hx1.2,
+          }
+        }
+      },
+      {
+        exfalso,
+        cases hS2' with h3 h4,
+        have h5: S2 = insert a S2,
+        {
+          have h6: insert a S2 = {a} ∪ S2 := insert_eq a S2,
+          rw h6,
+          have h7: {a} ∪ S2 = S2,
+          {
+            simp,
+            exact h2,
+          },
+          rw h7,
+        },
+        rw ← h5 at h4,
+        exact h3 h4,
+      }
+      
+    },
+    {
+      rw down.mem_compression at hS,
+      cases hS with hS hS,
+      {
+        exfalso,
+        exact hS2 hS.1,
+      },
+      {
+        cases hS with hS2 hS1,
+        use insert a S,
+        split,
+        assumption,
+        rw ← h1,
+        have h7: {a} ∪ S = insert a S := rfl,
+        rw ← h7,
+        have h8: F ∩ ({a} ∪ S) = (F ∩ {a}) ∪ (F ∩ S) := finset.inter_distrib_left F {a} S,
+        rw h8,
+        have h9: F ∩ {a} = ∅ := inter_singleton_of_not_mem ha,
+        rw h9,
+        simp,
+      }
+    }
+  }
+end
 
 /-- Down-compressing decreases the VC-dimension. -/
 lemma vc_dimension_compress_le (a : α) (𝒜 : finset (finset α)) :
   (𝓓 a 𝒜).vc_dimension ≤ 𝒜.vc_dimension :=
 begin
-  sorry,
+  have h: (𝓓 a 𝒜).shatterer ⊆ 𝒜.shatterer := ss_of_shatter_compress a 𝒜,
+  rw def_vc_dimension,
+  rw def_vc_dimension,
+  simp,
+  intros f hf,
+  have hf': f ∈ (𝓓 a 𝒜).shatterer,
+  rwa mem_shatterer,
+  have h1: f ∈ 𝒜.shatterer := h hf',
+  exact le_sup (h hf'),
 end
 
 /-- The **Sauer-Shelah lemma**. -/
